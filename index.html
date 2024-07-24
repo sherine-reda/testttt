@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Pay Integration</title>
+    <!-- Include Apple Pay JS API -->
+    <script src="https://apple.com/apple-pay/jsapi" crossorigin="anonymous"></script>
+</head>
+<body>
+    <h1>Welcome to Apple Pay</h1>
+    
+    <!-- Apple Pay button -->
+    <button id="apple-pay-button">Pay with Apple Pay</button>
+
+    <script>
+        document.getElementById('apple-pay-button').addEventListener('click', function() {
+            // Initialize ApplePaySession
+            var session = new ApplePaySession(1, {
+                merchantIdentifier: 'your_merchant_identifier',
+                displayName: 'Your Merchant Name',
+                // Other required and optional parameters
+            });
+
+            // Handle merchant validation
+            session.onvalidatemerchant = function(event) {
+                var validationURL = 'your_validation_url'; // Replace with your actual validation URL
+                event.completeMerchantValidation({
+                    merchantSession: {
+                        merchantIdentifier: 'your_merchant_identifier',
+                        displayName: 'Your Merchant Name',
+                        initiative: 'web',
+                        initiativeContext: 'your_website_url' // Replace with your actual website URL
+                    }
+                });
+            };
+
+            // Handle payment authorization
+            session.onpaymentauthorized = function(event) {
+                var payment = event.payment;
+                // Process the payment using your backend
+                // Example: send payment token to your server for processing
+                var paymentToken = payment.token.paymentData;
+                console.log('Payment Token:', paymentToken);
+
+                // Complete the payment
+                event.completePayment(ApplePaySession.STATUS_SUCCESS);
+            };
+
+            // Start the Apple Pay session
+            session.begin();
+        });
+    </script>
+</body>
+</html>
